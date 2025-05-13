@@ -1,0 +1,1 @@
+create a linkedin easy apply auto applier that uses openai to generate everything needed to apply

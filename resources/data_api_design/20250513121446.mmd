@@ -1,0 +1,28 @@
+
+classDiagram
+    class LinkedInIntegration {
+        +authenticate() bool
+        +fetch_profile_data() dict
+        +apply_to_job(job_id: str, application_data: dict) bool
+    }
+    class OpenAIIntegration {
+        +generate_content(profile_data: dict, job_description: str) dict
+    }
+    class UserInterface {
+        +display_dashboard() void
+        +edit_application(application_data: dict) dict
+        +show_application_status() void
+    }
+    class Database {
+        +store_application_data(application_data: dict) void
+        +retrieve_application_status(job_id: str) dict
+    }
+    class Security {
+        +encrypt_data(data: dict) dict
+        +decrypt_data(data: dict) dict
+    }
+    LinkedInIntegration --> UserInterface
+    OpenAIIntegration --> UserInterface
+    UserInterface --> Database
+    UserInterface --> Security
+    Database --> Security

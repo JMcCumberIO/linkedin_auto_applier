@@ -1,0 +1,23 @@
+
+sequenceDiagram
+    participant UI as UserInterface
+    participant LI as LinkedInIntegration
+    participant OAI as OpenAIIntegration
+    participant DB as Database
+    participant SEC as Security
+    UI->>LI: authenticate()
+    LI-->>UI: return bool
+    UI->>LI: fetch_profile_data()
+    LI-->>UI: return profile_data
+    UI->>OAI: generate_content(profile_data, job_description)
+    OAI-->>UI: return application_data
+    UI->>UI: edit_application(application_data)
+    UI->>SEC: encrypt_data(application_data)
+    SEC-->>UI: return encrypted_data
+    UI->>LI: apply_to_job(job_id, encrypted_data)
+    LI-->>UI: return bool
+    UI->>DB: store_application_data(encrypted_data)
+    DB-->>UI: void
+    UI->>DB: retrieve_application_status(job_id)
+    DB-->>UI: return status
+    UI->>UI: show_application_status()

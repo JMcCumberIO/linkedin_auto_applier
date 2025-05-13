@@ -2,14 +2,19 @@
 
 from flask import Flask, request, jsonify
 from user_interface import UserInterface
+from dotenv import load_dotenv
+import os
 
 app = Flask(__name__)
 
+# Load environment variables
+load_dotenv()
+
 # Default configuration values
-LINKEDIN_CLIENT_ID = 'your_linkedin_client_id'
-LINKEDIN_CLIENT_SECRET = 'your_linkedin_client_secret'
+LINKEDIN_CLIENT_ID = os.getenv('LINKEDIN_CLIENT_ID')
+LINKEDIN_CLIENT_SECRET = os.getenv('LINKEDIN_CLIENT_SECRET')
 LINKEDIN_REDIRECT_URI = 'http://localhost:5000/callback'
-OPENAI_API_KEY = 'your_openai_api_key'
+OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 ENCRYPTION_KEY = b'your_encryption_key'  # Ensure this is a bytes object
 
 # Initialize the UserInterface with necessary credentials and keys

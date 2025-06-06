@@ -4,8 +4,13 @@ from flask import Flask, request, jsonify
 from user_interface import UserInterface
 from dotenv import load_dotenv
 import os
+import base64
+import logging
 
 app = Flask(__name__)
+
+# Configure basic logging
+logging.basicConfig(level=logging.INFO)
 
 # Load environment variables
 load_dotenv()
@@ -15,7 +20,28 @@ LINKEDIN_CLIENT_ID = os.getenv('LINKEDIN_CLIENT_ID')
 LINKEDIN_CLIENT_SECRET = os.getenv('LINKEDIN_CLIENT_SECRET')
 LINKEDIN_REDIRECT_URI = 'http://localhost:5000/callback'
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
-ENCRYPTION_KEY = b'your_encryption_key'  # Ensure this is a bytes object
+
+# Load and decode ENCRYPTION_KEY from environment variable
+ENCRYPTION_KEY_B64 = os.getenv('ENCRYPTION_KEY')
+ENCRYPTION_KEY = None
+if ENCRYPTION_KEY_B64:
+    try:
+        ENCRYPTION_KEY = base64.b64decode(ENCRYPTION_KEY_B64)
+        if len(ENCRYPTION_KEY) not in [16, 24, 32]: # Common key lengths for AES
+            logging.warning(
+                "ENCRYPTION_KEY length (%d bytes) is not typical for AES (16, 24, or 32 bytes). "
+                "Ensure this is intentional.", len(ENCRYPTION_KEY)
+            )
+    except Exception as e: # Catching a broader exception for base64 decoding issues
+        logging.error(f"Failed to decode ENCRYPTION_KEY from base64: {e}. Please ensure it is a valid base64 string. Falling back to default insecure key for DEV ONLY.")
+        # Using a known, simple base64 string for the default insecure key.
+        # This is "abcdefghijklmnopqrstuvwxyz123456" base64 encoded.
+        ENCRYPTION_KEY = base64.b64decode("YWJjZGVmZ2hpamtsbW5vcHFyc3R1dnd4eXoxMjM0NTY=")
+else:
+    logging.warning("ENCRYPTION_KEY environment variable not set. Using a default, insecure key for development purposes ONLY. DO NOT USE IN PRODUCTION.")
+    # This is "abcdefghijklmnopqrstuvwxyz123456" base64 encoded.
+    ENCRYPTION_KEY = base64.b64decode("YWJjZGVmZ2hpamtsbW5vcHFyc3R1dnd4eXoxMjM0NTY=")
+
 
 # Initialize the UserInterface with necessary credentials and keys
 user_interface = UserInterface(

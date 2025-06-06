@@ -1,9 +1,13 @@
 ## database.py
 
+import logging
+import os # Added for environment variable access
 from typing import Dict
 from sqlalchemy import create_engine, Column, String, Integer, JSON
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+
+logger = logging.getLogger(__name__)
 
 Base = declarative_base()
 
@@ -18,14 +22,18 @@ class ApplicationData(Base):
 class Database:
     """Handles database interactions for storing and retrieving application data."""
 
-    def __init__(self, db_url: str = 'sqlite:///applications.db'):
+    def __init__(self, db_url: str = None):
         """Initializes the Database with a connection to the specified database URL.
+           The database URL is taken from the DATABASE_URL environment variable
+           if `db_url` is not provided, defaulting to 'sqlite:///applications.db'.
 
         Args:
-            db_url (str): The database URL. Defaults to a local SQLite database.
+            db_url (str, optional): The database URL. If None, uses DATABASE_URL env var.
         """
-        self.engine = create_engine(db_url)
-        Base.metadata.create_all(self.engine)
+        resolved_db_url = db_url or os.getenv('DATABASE_URL', 'sqlite:///applications.db')
+        logger.info(f"Initializing database with URL: {resolved_db_url}")
+        self.engine = create_engine(resolved_db_url)
+        Base.metadata.create_all(self.engine) # Note: Consider Alembic for production migrations
         self.Session = sessionmaker(bind=self.engine)
 
     def store_application_data(self, application_data: Dict) -> None:
@@ -33,16 +41,29 @@ class Database:
 
         Args:
             application_data (Dict): The application data to be stored.
+        Raises:
+            Exception: If database operation fails.
         """
         session = self.Session()
+        # Get job_id for logging, default if not found in the input dict
+        log_job_id = application_data.get('job_id', 'N/A')
+        db_job_id = application_data.get('job_id') # Actual job_id to be stored
+
+        if db_job_id is None:
+            logger.warning("Attempting to store application data with 'job_id' missing from input dictionary.")
+            # This will likely cause an IntegrityError due to `nullable=False` if not caught by SQLAlchemy's pre-validation
+            # or if the database itself enforces it strictly on empty string vs NULL.
+            # For now, we let it proceed to demonstrate ORM/DB constraint behavior.
+
         try:
-            job_id = application_data.get('job_id', '')
-            app_data = ApplicationData(job_id=job_id, application_data=application_data)
-            session.add(app_data)
+            app_data_instance = ApplicationData(job_id=db_job_id, application_data=application_data)
+            session.add(app_data_instance)
             session.commit()
+            logger.info(f"Successfully stored application data for job_id: {db_job_id}")
         except Exception as e:
-            print(f'Failed to store application data: {e}')
+            logger.error(f'Failed to store application data for job_id "{log_job_id}": {e}', exc_info=True)
             session.rollback()
+            raise
         finally:
             session.close()
 
@@ -53,18 +74,22 @@ class Database:
             job_id (str): The job ID for which to retrieve the application status.
 
         Returns:
-            Dict: A dictionary containing the application data for the specified job ID.
+            Dict: A dictionary containing the application data for the specified job ID,
+                  or an empty dictionary if not found.
+        Raises:
+            Exception: If database operation fails.
         """
         session = self.Session()
         try:
             application = session.query(ApplicationData).filter_by(job_id=job_id).first()
             if application:
+                logger.debug(f"Retrieved application data for job_id: {job_id}")
                 return application.application_data
             else:
-                print(f'No application found for job ID: {job_id}')
+                logger.info(f'No application found for job ID: {job_id}')
                 return {}
         except Exception as e:
-            print(f'Failed to retrieve application status: {e}')
-            return {}
+            logger.error(f'Failed to retrieve application status for job_id "{job_id}": {e}', exc_info=True)
+            raise
         finally:
             session.close()

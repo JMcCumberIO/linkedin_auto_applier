@@ -30,7 +30,11 @@ class Database:
         Args:
             db_url (str, optional): The database URL. If None, uses DATABASE_URL env var.
         """
-        resolved_db_url = db_url or os.getenv('DATABASE_URL', 'sqlite:///applications.db')
+        hardcoded_default_url = 'sqlite:///applications.db'
+        env_db_url = os.getenv('DATABASE_URL')
+
+        resolved_db_url = db_url or env_db_url or hardcoded_default_url
+
         logger.info(f"Initializing database with URL: {resolved_db_url}")
         self.engine = create_engine(resolved_db_url)
         Base.metadata.create_all(self.engine) # Note: Consider Alembic for production migrations

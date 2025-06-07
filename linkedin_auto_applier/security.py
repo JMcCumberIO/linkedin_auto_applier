@@ -55,8 +55,9 @@ class Security:
             encrypted_string = encrypted_bytes.decode('utf-8') # Fernet token is URL-safe base64
             logger.debug("Data encrypted successfully.")
             return encrypted_string
-        except json.JSONEncodeError as e:
-            logger.error(f"Failed to serialize data to JSON for encryption: {e}", exc_info=True)
+        except TypeError as e: # Changed from json.JSONEncodeError
+            # This handles cases where data is not JSON serializable (e.g. set)
+            logger.error(f"Failed to serialize data to JSON for encryption (TypeError): {e}", exc_info=True)
             raise # Re-raise to indicate serialization failure
         except Exception as e:
             logger.error(f'Failed to encrypt data: {e}', exc_info=True)

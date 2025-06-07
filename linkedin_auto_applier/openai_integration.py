@@ -20,14 +20,20 @@ class OpenAIIntegration:
             logger.error("OpenAI API key is required.")
             raise ValueError("OpenAI API key is required.")
 
-        self.api_key = api_key
-        openai.api_key = self.api_key # Set globally for the openai library
+        # self.api_key = api_key # No longer need to store if client is instantiated here
+        # openai.api_key = self.api_key # Global assignment is deprecated
+        try:
+            self.client = openai.OpenAI(api_key=api_key)
+        except Exception as e:
+            logger.error(f"Failed to initialize OpenAI client: {e}", exc_info=True)
+            raise ValueError(f"Failed to initialize OpenAI client: {e}")
+
         self.model = model
         logger.info(f"OpenAIIntegration initialized with model: {self.model}")
 
     def generate_content(self, profile_data: Dict, job_description: str,
                          task_prompt: str = "Generate a concise and compelling cover letter introduction based on the following profile and job description.") -> str:
-        """Generates application content using OpenAI's Chat Completions API.
+        """Generates application content using OpenAI's Chat Completions API (v1.x).
 
         Args:
             profile_data (Dict): The user's LinkedIn profile data.
@@ -42,32 +48,35 @@ class OpenAIIntegration:
 
         try:
             logger.info(f"Sending request to OpenAI API. Model: {self.model}. Task: {task_prompt[:50]}...")
-            response = openai.ChatCompletion.create(
+            # Updated API call for openai >= 1.0.0
+            response = self.client.chat.completions.create(
                 model=self.model,
                 messages=messages,
-                max_tokens=250,  # Increased max_tokens, adjust as needed
+                max_tokens=250,
                 n=1,
                 stop=None,
-                temperature=0.6  # Slightly lowered temperature for more focused content
+                temperature=0.6
             )
 
-            if response.choices and response.choices[0].message:
-                generated_content = response.choices[0].message.get('content', '').strip()
+            # Accessing content in the new response structure
+            if response.choices and response.choices[0].message and response.choices[0].message.content:
+                generated_content = response.choices[0].message.content.strip()
                 logger.info("Successfully generated content from OpenAI.")
                 return generated_content
             else:
                 logger.warning("OpenAI response did not contain expected content.")
                 return ""
 
-        except openai.error.APIError as e:
+        # Updated error handling for openai >= 1.0.0
+        except openai.APIError as e: # Base class for API errors
             logger.error(f"OpenAI API returned an API Error: {e}", exc_info=True)
-        except openai.error.APIConnectionError as e:
+        except openai.APIConnectionError as e:
             logger.error(f"Failed to connect to OpenAI API: {e}", exc_info=True)
-        except openai.error.RateLimitError as e:
+        except openai.RateLimitError as e:
             logger.error(f"OpenAI API request exceeded rate limit: {e}", exc_info=True)
-        except openai.error.AuthenticationError as e:
+        except openai.AuthenticationError as e:
             logger.error(f"OpenAI API key error: {e}", exc_info=True)
-        except openai.error.InvalidRequestError as e:
+        except openai.BadRequestError as e: # Changed from InvalidRequestError
             logger.error(f"Invalid request to OpenAI API: {e}. Prompt messages: {messages}", exc_info=True)
         except Exception as e:
             logger.error(f'An unexpected error occurred while generating content: {e}', exc_info=True)

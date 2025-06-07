@@ -57,6 +57,13 @@ def home():
     """Displays the home page."""
     return "Welcome to the LinkedIn Easy Apply Application!"
 
+@app.route('/search_jobs', methods=['GET']) # Changed to GET as it's initiating a console interaction
+def search_jobs_route():
+    """Initiates the job search process via console interaction."""
+    # This will trigger the interactive search in the console
+    user_interface.search_and_display_jobs()
+    return jsonify({"message": "Job search process initiated in console. Check your terminal."})
+
 @app.route('/dashboard', methods=['GET'])
 def dashboard():
     """Displays the user dashboard."""

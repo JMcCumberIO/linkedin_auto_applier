@@ -98,6 +98,45 @@ class LinkedInIntegration:
             logger.error(f'An unexpected error occurred while fetching profile data: {e}', exc_info=True)
             return {}
 
+    def search_jobs(self, keywords: list[str], location: str = None) -> list[Dict]:
+        """Searches for jobs on LinkedIn based on keywords and optionally location.
+        NOTE: This method assumes a hypothetical job search API endpoint and parameters.
+        The actual LinkedIn API might differ and require specific partner permissions.
+        """
+        if not self.oauth.authorized:
+            logger.error("Not authorized. Call authenticate() or exchange_code_for_token() first.")
+            return []
+
+        # Hypothetical job search endpoint and parameters
+        # Consult LinkedIn documentation for actual job search APIs.
+        search_url = f'{self.api_base_url}/jobs'
+        params = {
+            'keywords': ' '.join(keywords), # Example: "Python Developer"
+            # 'filter.jobType': 'F', # Example: Full-time
+            # 'filter.location': location if location else 'us:0' # Example: United States
+        }
+        if location:
+            params['location'] = location
+
+        headers = {'X-Restli-Protocol-Version': '2.0.0'} # Common header for LinkedIn API
+
+        logger.info(f"Searching for jobs with keywords: {keywords} at {search_url} with params {params}")
+        try:
+            response = self.oauth.get(search_url, params=params, headers=headers)
+            response.raise_for_status()  # Raises HTTPError for bad responses (4xx or 5xx)
+            jobs_data = response.json()
+            # The actual structure of the response will depend on the LinkedIn API
+            # Assuming it returns a list of job objects under an 'elements' key, like other LinkedIn APIs
+            jobs = jobs_data.get('elements', [])
+            logger.info(f"Found {len(jobs)} jobs matching keywords: {keywords}")
+            return jobs
+        except RequestException as e:
+            error_content = e.response.json() if e.response and e.response.content else "No additional error content"
+            logger.error(f'Failed to search jobs: {e}. Response: {error_content}', exc_info=True)
+            return []
+        except Exception as e: # Catch other potential errors like JSON decoding
+            logger.error(f'An unexpected error occurred during job search: {e}', exc_info=True)
+            return []
 
     def apply_to_job(self, job_id: str, application_data: Dict) -> bool:
         """Applies to a job on LinkedIn using the provided application data.

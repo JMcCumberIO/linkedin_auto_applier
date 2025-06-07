@@ -36,15 +36,25 @@ LinkedIn Auto Applier is a Python-based application designed to automate the Lin
 
 ## Usage
 
-1. Set up environment variables in a `.env` file:
+1.  Set up environment variables. Create a `.env` file in the `linkedin_auto_applier` directory by copying the `linkedin_auto_applier/.env.example` file:
+    ```bash
+    cp linkedin_auto_applier/.env.example linkedin_auto_applier/.env
+    ```
+    Then, edit `linkedin_auto_applier/.env` with your actual credentials and settings:
 
-   ```env
-   LINKEDIN_CLIENT_ID=<your-client-id>
-   LINKEDIN_CLIENT_SECRET=<your-client-secret>
-   OPENAI_API_KEY=<your-openai-api-key>
-   ```
+    ```env
+    LINKEDIN_CLIENT_ID="YOUR_LINKEDIN_CLIENT_ID"
+    LINKEDIN_CLIENT_SECRET="YOUR_LINKEDIN_CLIENT_SECRET"
+    LINKEDIN_REDIRECT_URI="YOUR_LINKEDIN_REDIRECT_URI_HERE" # Important for OAuth callback
 
-2. Run the application:
+    OPENAI_API_KEY="YOUR_OPENAI_API_KEY"
+
+    ENCRYPTION_KEY="YOUR_GENERATED_BASE64_ENCODED_KEY" # See .env.example for generation command
+
+    DATABASE_URL="sqlite:///applications.db" # Or your preferred database connection string
+    ```
+
+2.  Run the application:
 
    ```bash
    python linkedin_auto_applier/app.py

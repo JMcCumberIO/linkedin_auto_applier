@@ -44,6 +44,7 @@ LinkedIn Auto Applier is a Python-based application designed to automate the Lin
    LINKEDIN_CLIENT_ID=<your-client-id>
    LINKEDIN_CLIENT_SECRET=<your-client-secret>
    OPENAI_API_KEY=<your-openai-api-key>
+   ENCRYPTION_KEY=<your-encryption-key>
    ```
 
 2. Run the application:

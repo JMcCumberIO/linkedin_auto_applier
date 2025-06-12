@@ -1,7 +1,7 @@
 ## app.py
 
 from flask import Flask, request, jsonify
-from user_interface import UserInterface
+from .user_interface import UserInterface
 from dotenv import load_dotenv
 import os
 

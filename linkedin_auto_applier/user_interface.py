@@ -1,10 +1,10 @@
 ## user_interface.py
 
 from typing import Dict
-from linkedin_integration import LinkedInIntegration
-from openai_integration import OpenAIIntegration
-from database import Database
-from security import Security
+from .linkedin_integration import LinkedInIntegration
+from .openai_integration import OpenAIIntegration
+from .database import Database
+from .security import Security
 
 class UserInterface:
     """Handles the user interface for displaying dashboards, editing applications, and showing application status."""

@@ -12,9 +12,16 @@ class OpenAIIntegration:
         if self.api_key:
             openai.api_key = self.api_key
 
-    def generate_content(self, job_description: str, profile_data: Dict | None = None) -> str:
-        """Generates application content using OpenAI's GPT model based on profile data and job description."""
-        profile_data = profile_data or {}
+    def generate_content(self, profile_data: Dict, job_description: str) -> Dict:
+        """Generates application content using OpenAI's GPT model based on profile data and job description.
+
+        Args:
+            profile_data (Dict): The user's LinkedIn profile data.
+            job_description (str): The job description for which to generate application content.
+
+        Returns:
+            Dict: A dictionary containing the generated application content under the key ``"application_content"``.
+        """
         try:
             prompt = self._create_prompt(profile_data, job_description)
             response = openai.Completion.create(
@@ -30,10 +37,10 @@ class OpenAIIntegration:
                 generated_content = choice.get('text', '').strip()
             else:
                 generated_content = choice.text.strip()
-            return generated_content
+            return {"application_content": generated_content}
         except Exception as e:
             print(f'Failed to generate content: {e}')
-            return ""
+            return {"application_content": ""}
 
     def _create_prompt(self, profile_data: Dict, job_description: str) -> str:
         """Creates a prompt for the OpenAI model based on the user's profile data and job description.

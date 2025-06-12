@@ -20,17 +20,28 @@ class LinkedInIntegration:
         else:
             self.oauth = None
 
-    def authenticate(self, client_id: str, client_secret: str) -> str:
-        """Authenticates with LinkedIn and returns an access token."""
-        data = {
-            'client_id': client_id,
-            'client_secret': client_secret,
-            'grant_type': 'client_credentials'
-        }
-        response = requests.post(self.token_url, data=data)
-        if response.status_code == 200:
-            return response.json().get('access_token', '')
-        raise Exception('Authentication failed')
+    def authenticate(self, client_id: str | None = None, client_secret: str | None = None) -> bool:
+        """Authenticates with LinkedIn via OAuth2 session."""
+        client_id = client_id or self.client_id
+        client_secret = client_secret or self.client_secret
+        if not client_id or not self.redirect_uri:
+            print('Client ID and redirect URI must be provided for authentication.')
+            return False
+        if not self.oauth:
+            self.oauth = OAuth2Session(client_id, redirect_uri=self.redirect_uri)
+        try:
+            authorization_url, state = self.oauth.authorization_url(self.authorization_base_url)
+            print(f"Please go to {authorization_url} and authorize access.")
+            redirect_response = input("Paste the full redirect URL here: ")
+            self.oauth.fetch_token(
+                self.token_url,
+                authorization_response=redirect_response,
+                client_secret=client_secret
+            )
+            return True
+        except Exception as e:
+            print(f'Failed to authenticate: {e}')
+            return False
 
     def fetch_profile_data(self) -> Dict:
         """Fetches the user's LinkedIn profile data."""

@@ -12,7 +12,7 @@ class OpenAIIntegration:
         if self.api_key:
             openai.api_key = self.api_key
 
-    def generate_content(self, job_description: str, profile_data: Dict | None = None) -> str:
+    def generate_content(self, profile_data: Dict | None = None, job_description: str = "") -> Dict:
         """Generates application content using OpenAI's GPT model based on profile data and job description."""
         profile_data = profile_data or {}
         try:
@@ -30,10 +30,10 @@ class OpenAIIntegration:
                 generated_content = choice.get('text', '').strip()
             else:
                 generated_content = choice.text.strip()
-            return generated_content
+            return {"application_content": generated_content}
         except Exception as e:
             print(f'Failed to generate content: {e}')
-            return ""
+            return {"application_content": ""}
 
     def _create_prompt(self, profile_data: Dict, job_description: str) -> str:
         """Creates a prompt for the OpenAI model based on the user's profile data and job description.

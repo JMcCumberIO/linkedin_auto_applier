@@ -21,7 +21,12 @@ class TestLinkedInIntegration(unittest.TestCase):
         result = linkedin.authenticate()
 
         self.assertTrue(result)
-        mock_session.fetch_token.assert_called_once()
+        mock_session.fetch_token.assert_called_once_with(
+            linkedin.token_url,
+            authorization_response='http://localhost?code=123',
+            client_id='client_id',
+            client_secret='client_secret'
+        )
 
     @patch('builtins.input', return_value='http://localhost?code=123')
     @patch('linkedin_auto_applier.linkedin_integration.OAuth2Session')

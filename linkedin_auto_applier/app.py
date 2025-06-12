@@ -18,6 +18,18 @@ OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 ENCRYPTION_KEY_ENV = os.getenv('ENCRYPTION_KEY')
 ENCRYPTION_KEY = ENCRYPTION_KEY_ENV.encode() if ENCRYPTION_KEY_ENV else None
 
+# Ensure required environment variables are present
+_required_vars = {
+    'LINKEDIN_CLIENT_ID': LINKEDIN_CLIENT_ID,
+    'LINKEDIN_CLIENT_SECRET': LINKEDIN_CLIENT_SECRET,
+    'OPENAI_API_KEY': OPENAI_API_KEY,
+}
+_missing = [name for name, value in _required_vars.items() if not value]
+if _missing:
+    raise EnvironmentError(
+        f"Missing required environment variables: {', '.join(_missing)}"
+    )
+
 # Initialize the UserInterface with necessary credentials and keys
 user_interface = UserInterface(
     linkedin_client_id=LINKEDIN_CLIENT_ID,

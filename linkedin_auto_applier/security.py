@@ -2,6 +2,7 @@
 
 from typing import Dict
 from cryptography.fernet import Fernet
+import json
 
 class Security:
     """Provides methods for encrypting and decrypting user data to ensure security."""
@@ -28,8 +29,8 @@ class Security:
             Dict: A dictionary containing the encrypted data.
         """
         try:
-            # Convert the dictionary to a string and then to bytes
-            data_str = str(data)
+            # Serialize the dictionary to JSON bytes
+            data_str = json.dumps(data)
             encrypted_data = self.cipher.encrypt(data_str.encode('utf-8'))
             return {"encrypted_data": encrypted_data.decode('utf-8')}
         except Exception as e:
@@ -49,8 +50,8 @@ class Security:
             # Extract the encrypted data and convert it to bytes
             encrypted_data = data.get("encrypted_data", "").encode('utf-8')
             decrypted_data = self.cipher.decrypt(encrypted_data)
-            # Convert bytes back to a dictionary
-            decrypted_data_dict = eval(decrypted_data.decode('utf-8'))
+            # Convert JSON bytes back to a dictionary
+            decrypted_data_dict = json.loads(decrypted_data.decode('utf-8'))
             return decrypted_data_dict
         except Exception as e:
             print(f'Failed to decrypt data: {e}')

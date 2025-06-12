@@ -1,6 +1,7 @@
-cryptography==3.4.7
-openai==0.10.2
-flask==2.0.1
-requests==2.25.1
-sqlalchemy==1.4.22
-oauthlib==3.1.0
+cryptography==45.0.4
+flask==3.1.1
+oauthlib==3.2.2
+openai==1.86.0
+requests==2.32.4
+requests-oauthlib==2.0.0
+sqlalchemy==2.0.41

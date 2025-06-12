@@ -58,7 +58,7 @@ def status():
     if not job_id:
         return jsonify({"error": "Job ID is required."}), 400
 
-    status = user_interface.database.retrieve_application_status(job_id)
+    status = user_interface.database.retrieve_application_data(job_id)
     if status:
         return jsonify({"status": status})
     else:

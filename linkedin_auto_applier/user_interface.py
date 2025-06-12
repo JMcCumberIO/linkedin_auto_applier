@@ -47,7 +47,7 @@ class UserInterface:
     def show_application_status(self) -> None:
         """Displays the status of the user's job applications."""
         job_id = input("Enter the job ID to check the application status: ")
-        status = self.database.retrieve_application_status(job_id)
+        status = self.database.retrieve_application_data(job_id)
         if status:
             print(f"Application Status for Job ID {job_id}: {status}")
         else:

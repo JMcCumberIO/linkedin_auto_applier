@@ -1,6 +1,6 @@
 ## openai_integration.py
 
-from typing import Dict
+from typing import Dict, List
 import openai
 
 class OpenAIIntegration:
@@ -16,42 +16,41 @@ class OpenAIIntegration:
         """Generates application content using OpenAI's GPT model based on profile data and job description."""
         profile_data = profile_data or {}
         try:
-            prompt = self._create_prompt(profile_data, job_description)
-            response = openai.Completion.create(
-                engine="text-davinci-003",
-                prompt=prompt,
+            messages = self._create_messages(profile_data, job_description)
+            response = openai.ChatCompletion.create(
+                model="gpt-3.5-turbo",
+                messages=messages,
                 max_tokens=150,
                 n=1,
-                stop=None,
                 temperature=0.7
             )
             choice = response.choices[0]
             if isinstance(choice, dict):
-                generated_content = choice.get('text', '').strip()
+                generated_content = choice.get("message", {}).get("content", "").strip()
             else:
-                generated_content = choice.text.strip()
+                generated_content = choice.message["content"].strip()
             return {"application_content": generated_content}
         except Exception as e:
             print(f'Failed to generate content: {e}')
             return {"application_content": ""}
 
-    def _create_prompt(self, profile_data: Dict, job_description: str) -> str:
-        """Creates a prompt for the OpenAI model based on the user's profile data and job description.
+    def _create_messages(self, profile_data: Dict, job_description: str) -> List[Dict[str, str]]:
+        """Creates chat messages for the OpenAI model based on the user's profile data and job description.
 
         Args:
             profile_data (Dict): The user's LinkedIn profile data.
             job_description (str): The job description for which to generate application content.
 
         Returns:
-            str: A formatted prompt string for the OpenAI model.
+            List[Dict[str, str]]: Chat messages to send to the OpenAI API.
         """
         profile_summary = profile_data.get('summary', 'No summary available.')
         profile_experience = profile_data.get('experience', 'No experience available.')
-        prompt = (
-            f"Generate a personalized job application content based on the following profile summary and experience:\n"
+        content = (
+            "Generate a personalized job application content based on the following profile summary and experience:\n"
             f"Profile Summary: {profile_summary}\n"
             f"Experience: {profile_experience}\n"
             f"Job Description: {job_description}\n"
-            f"Application Content:"
+            "Application Content:"
         )
-        return prompt
+        return [{"role": "user", "content": content}]

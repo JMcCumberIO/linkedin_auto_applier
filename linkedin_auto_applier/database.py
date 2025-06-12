@@ -28,15 +28,15 @@ class Database:
         Base.metadata.create_all(self.engine)
         self.Session = sessionmaker(bind=self.engine)
 
-    def store_application_data(self, application_data: Dict) -> None:
+    def store_application_data(self, job_id: str, application_data: Dict) -> None:
         """Stores the application data in the database.
 
         Args:
+            job_id (str): The LinkedIn job ID for which the application was submitted.
             application_data (Dict): The application data to be stored.
         """
         session = self.Session()
         try:
-            job_id = application_data.get('job_id', '')
             app_data = ApplicationData(job_id=job_id, application_data=application_data)
             session.add(app_data)
             session.commit()

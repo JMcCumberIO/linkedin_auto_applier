@@ -15,7 +15,8 @@ LINKEDIN_CLIENT_ID = os.getenv('LINKEDIN_CLIENT_ID')
 LINKEDIN_CLIENT_SECRET = os.getenv('LINKEDIN_CLIENT_SECRET')
 LINKEDIN_REDIRECT_URI = 'http://localhost:5000/callback'
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
-ENCRYPTION_KEY = b'your_encryption_key'  # Ensure this is a bytes object
+ENCRYPTION_KEY_ENV = os.getenv('ENCRYPTION_KEY')
+ENCRYPTION_KEY = ENCRYPTION_KEY_ENV.encode() if ENCRYPTION_KEY_ENV else None
 
 # Initialize the UserInterface with necessary credentials and keys
 user_interface = UserInterface(

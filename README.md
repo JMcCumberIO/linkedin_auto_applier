@@ -38,7 +38,8 @@ LinkedIn Auto Applier is a Python-based application designed to automate the Lin
 
 ## Usage
 
-1. Set up environment variables in a `.env` file:
+1. Set up environment variables in a `.env` file. The LinkedIn and OpenAI
+   credentials are required at startup:
 
    ```env
    LINKEDIN_CLIENT_ID=<your-client-id>
@@ -46,6 +47,9 @@ LinkedIn Auto Applier is a Python-based application designed to automate the Lin
    OPENAI_API_KEY=<your-openai-api-key>
    ENCRYPTION_KEY=<your-encryption-key>
    ```
+
+   If `LINKEDIN_CLIENT_ID`, `LINKEDIN_CLIENT_SECRET`, or `OPENAI_API_KEY` are
+   missing, the application will raise an error when launched.
 
 2. Run the application:
 

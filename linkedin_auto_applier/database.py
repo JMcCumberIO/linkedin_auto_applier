@@ -46,14 +46,14 @@ class Database:
         finally:
             session.close()
 
-    def retrieve_application_status(self, job_id: str) -> Dict:
-        """Retrieves the application status for a given job ID.
+    def retrieve_application_data(self, job_id: str) -> Dict:
+        """Retrieves the stored application data for a given job ID.
 
         Args:
-            job_id (str): The job ID for which to retrieve the application status.
+            job_id (str): The job ID for which to retrieve the application data.
 
         Returns:
-            Dict: A dictionary containing the application data for the specified job ID.
+            Dict: A dictionary containing the stored application data for the specified job ID.
         """
         session = self.Session()
         try:
@@ -64,7 +64,7 @@ class Database:
                 print(f'No application found for job ID: {job_id}')
                 return {}
         except Exception as e:
-            print(f'Failed to retrieve application status: {e}')
+            print(f'Failed to retrieve application data: {e}')
             return {}
         finally:
             session.close()

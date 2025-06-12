@@ -25,9 +25,11 @@ LinkedIn Auto Applier is a Python-based application designed to automate the Lin
 
    ```bash
    python -m venv venv
+   # On Unix or macOS
+   source venv/bin/activate
+   # On Windows
    .\venv\Scripts\Activate.ps1
    ```
-
 3. Install dependencies:
 
    ```bash

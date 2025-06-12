@@ -53,6 +53,23 @@ LinkedIn Auto Applier is a Python-based application designed to automate the Lin
    python linkedin_auto_applier/app.py
    ```
 
+## Running the Unit Tests
+
+To run the automated test suite, create a virtual environment and install the
+project dependencies if you haven't already, then execute `pytest`:
+
+```bash
+# Create and activate a virtual environment
+python -m venv venv
+source venv/bin/activate  # On Windows use `.\\venv\\Scripts\\Activate.ps1`
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Run the tests
+pytest
+```
+
 ## Contribution Guidelines
 
 - Fork the repository and create a new branch for your feature or bug fix.

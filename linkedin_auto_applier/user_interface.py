@@ -66,7 +66,7 @@ class UserInterface:
             edited_application = self.edit_application(application_content)
             encrypted_data = self.security.encrypt_data(edited_application)
             if self.linkedin_integration.apply_to_job(job_id, encrypted_data):
-                self.database.store_application_data(encrypted_data)
+                self.database.store_application_data(job_id, encrypted_data)
                 print("Application submitted successfully!")
             else:
                 print("Failed to submit the application.")

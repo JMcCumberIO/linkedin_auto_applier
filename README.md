@@ -59,4 +59,4 @@ LinkedIn Auto Applier is a Python-based application designed to automate the Lin
 
 ## License
 
-This project is licensed under the MIT License. See the LICENSE file for details.
+This project is licensed under the [MIT License](LICENSE).
